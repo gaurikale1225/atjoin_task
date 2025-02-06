@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Generator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="file"]{
+            margin-bottom: 10px;
+        }
+
+        button {
+           
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #certificate-preview {
+            border: 2px solid blue; /* Blue border */
+            margin-top: 20px;
+            padding: 20px;
+            width: 300px; /* Example width */
+            height: 200px; /* Example height */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background-color: lightyellow; /* Example background */
+        }
+
+        #certificate-preview img {
+            max-width: 100px;
+            max-height: 100px;
+            margin-bottom: 10px;
+            border-radius: 50%; /* Make image circular */
+        }
+
+        #certificate-preview p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" style="border: 2px solid black;">
+    <h2 style="text-align: center;">Certificate Generator</h2>
+    <form id="certificate-form" >
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+
+        <label for="photo">Photo:</label>
+        <input type="file" id="photo" accept="image/*" required>
+
+        <label for="rank">Rank:</label>
+        <select id="rank">
+            <option value="First Rank">First Rank</option>
+            <option value="Second Rank">Second Rank</option>
+            <option value="Third Rank">Third Rank</option>
+        </select>
+
+        <label for="id">ID:</label>
+        <input type="text" id="id" readonly> <br>
+
+        <button type="button" onclick="generateCertificate()" style="background-color: blue;">Generate Certificate</button>
+    </form>
+
+    <div id="certificate-preview">
+        </div>
+</div>
+
+<script>
+    function generateCertificate() {
+        const name = document.getElementById('name').value;
+        const photo = document.getElementById('photo').files[0];
+        const rank = document.getElementById('rank').value;
+        const id = generateId();
+
+        document.getElementById('id').value = id; // Display generated ID
+
+        const preview = document.getElementById('certificate-preview');
+        preview.innerHTML = ''; // Clear previous content
+
+        if (photo) {
+             const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                preview.appendChild(img);
+            }
+            reader.readAsDataURL(photo);
+        }
+
+
+        const namePara = document.createElement('p');
+        namePara.textContent = "Name: " + name;
+        preview.appendChild(namePara);
+
+        const rankPara = document.createElement('p');
+        rankPara.textContent = "Rank: " + rank;
+        preview.appendChild(rankPara);
+
+        const idPara = document.createElement('p');
+        idPara.textContent = "ID: " + id;
+        preview.appendChild(idPara);
+
+         // Basic PDF/Image generation (using a library is recommended for more advanced features)
+        html2canvas(preview).then(canvas => {
+            const dataURL = canvas.toDataURL('image/png'); // or image/jpeg
+
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = 'certificate.png'; // or certificate.jpg
+            link.click();
+        });
+    }
+
+    function generateId() {
+        const randomNumber = Math.floor(100000 + Math.random() * 900000);
+        return "#" + randomNumber;
+    }
+
+    // Add html2canvas library (you can use a CDN or download it)
+    const script = document.createElement('script');
+    script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js'; // CDN
+    document.head.appendChild(script);
+</script>
+
+</body>
+</html>
